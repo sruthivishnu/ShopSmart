@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>My Orders</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <a href="/" class="logo">
+
+    Shop<span>Smart</span>
+
+</a>
+
+    <div>
+
+        <a href="/" class="home-btn">
+
+            Home
+
+        </a>
+
+        <a href="/cart" class="home-btn">
+
+            Cart
+
+        </a>
+
+        <a href="/logout" class="home-btn">
+
+            Logout
+
+        </a>
+
+    </div>
+
+</div>
+
+<div class="main-container">
+
+    {% if not orders %}
+
+<div class="empty-cart">
+
+    <div class="empty-cart-icon">
+
+        📦
+
+    </div>
+
+    <h2>
+
+        No Orders Yet
+
+    </h2>
+
+    <p>
+
+        Your purchased products will appear here.
+
+    </p>
+
+    <a href="/"
+
+       class="footer-btn">
+
+        Start Shopping
+
+    </a>
+
+</div>
+
+{% else %}
+
+<div class="cart-header">
+
+    <h1>
+
+        📦 My Orders
+
+    </h1>
+
+    <p>
+
+        {{ orders|length }} Order(s)
+
+    </p>
+
+</div>
+
+    {% for item in orders %}
+
+    <div class="orders-card">
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename=item.image
+            ) }}"
+            class="orders-image"
+        >
+
+        <div class="orders-details">
+
+    <h2>
+
+        {{ item.product_name }}
+
+    </h2>
+
+    <div class="review-summary">
+
+        ✔ Delivered
+
+    </div>
+
+    <p>
+
+        <strong>Price:</strong>
+
+        ₹{{ "{:,}".format(item.price) }}
+
+    </p>
+
+    <p>
+
+        <strong>Quantity:</strong>
+
+        {{ item.quantity }}
+
+    </p>
+
+    <p>
+
+        <strong>Ordered On:</strong>
+
+        {{ item.order_date }}
+
+    </p>
+
+    <br>
+
+    <a
+    href="/recommend/{{ item.product_id }}"
+    class="checkout-btn"
+>
+
+    Buy Again
+
+</a>
+
+</div>
+
+        </div>
+
+    {% endfor %}
+
+{% endif %}
+
+</div>
+
+</body>
+
+</html>

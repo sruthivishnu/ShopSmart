@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>
+        Ecommerce Recommendation System
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+
+    <div class="navbar">
+
+    <div class="navbar-left">
+
+        <div class="logo">
+
+            ShopSmart
+
+        </div>
+
+        <button
+            onclick="history.back()"
+            class="home-btn back-btn"
+        >
+            ← Back
+        </button>
+
+    </div>
+
+    <div class="navbar-right">
+
+        <a href="/" class="home-btn">
+            Home
+        </a>
+
+        <a href="/cart" class="cart-link">
+
+            🛒 Cart
+
+            <span class="cart-badge">
+
+                {{ cart_count }}
+
+            </span>
+
+        </a>
+
+
+        <a href="/orders" class="home-btn">
+
+            My Orders
+
+        </a>
+
+        {% if session.get('user_id') %}
+
+            <a href="/logout" class="home-btn">
+                Logout
+            </a>
+
+        {% else %}
+
+            <a href="/login" class="home-btn">
+                Login
+            </a>
+
+        {% endif %}
+
+    </div>
+
+
+</div>
+
+
+</div>
+    <div class="main-container">
+    <!-- SELECTED PRODUCT -->
+
+    {% if selected_product is not none %}
+
+    <div class="selected-product">
+
+        <img
+            src="{{ url_for(
+                'static',
+                filename=selected_product.image
+            ) }}"
+            class="selected-image"
+        >
+
+        <div class="selected-details">
+
+            <h1>
+                {{ selected_product.product_name }}
+            </h1>
+
+            <p class="category">
+
+                {{ selected_product.category }}
+
+            </p>
+
+            <h2 class="main-price">
+
+                ₹{{ "{:,}".format(selected_product.price) }}
+
+            </h2>
+
+            <div class="review-summary">
+
+                ⭐⭐⭐⭐⭐
+
+                {{ "%.1f"|format(average_rating) }}
+
+                ({{ review_count }} Reviews)
+
+            </div>
+            
+
+            <div class="product-description">
+
+                <h3>About this product</h3>
+
+                <ul>
+
+                    <li>Premium quality product</li>
+
+                    <li>Highly rated by customers</li>
+
+                    <li>Fast delivery available</li>
+
+                    <li>Easy return policy</li>
+
+                </ul>
+
+            </div>
+
+            <div class="button-group">
+
+                <form action="/add_to_cart/{{ selected_product.product_id }}" method="POST">
+
+                    <button type="submit" class="cart-btn">
+
+                        Add to Cart
+
+                    </button>
+
+                </form>
+
+                <a href="/buy_now/{{ selected_product.product_id }}">
+
+                    <button class="buy-btn">
+
+                        Buy Now
+
+                    </button>
+
+                </a>
+
+            </div>
+
+
+
+        </div>
+
+    </div>
+
+    {% endif %}
+
+
+
+
+    <!-- RECOMMENDATION SECTIONS -->
+
+    {% for section_name, products in recommendation_sections.items() %}
+
+        <h2 class="section-title">
+
+            {{ section_name }}
+
+        </h2>
+
+        <div class="horizontal-scroll">
+
+            {% for item in products.to_dict('records') %}
+
+                <div class="product-card">
+
+                    <a
+                        href="{{ url_for(
+                            'recommend',
+                            product_id=item.product_id
+                        ) }}"
+                    >
+
+                        <img
+                            src="{{ url_for(
+                                'static',
+                                filename=item.image
+                            ) }}"
+                            class="product-image"
+                        >
+
+                    </a>
+
+                    <h3 class="product-title">
+
+                        {{ item.product_name }}
+
+                    </h3>
+
+                    <p class="product-category">
+
+                        {{ item.category }}
+
+                    </p>
+
+                    <p class="product-price">
+
+                        ₹{{ "{:,}".format(item.price) }}
+
+                    </p>
+
+                    <form
+                        action="/add_to_cart/{{ item.product_id }}"
+                        method="POST"
+                    >
+
+                        <button
+                            type="submit"
+                            class="small-cart-btn"
+                        >
+
+                            Add To Cart
+
+                        </button>
+
+                    </form>
+
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endfor %}
+
+     <div class="reviews-section">
+
+        <h2 class="section-title">
+
+            Customer Reviews
+
+        </h2>
+
+        {% if reviews %}
+
+            {% for review in reviews %}
+
+            <div class="review-card">
+
+                <h4>
+                    👤 {{ review[0] }}
+                </h4>
+
+                <p class="review-stars">
+
+                    {% for i in range(review[1]) %}
+                        ⭐
+                    {% endfor %}
+
+                </p>
+
+                <p>
+
+                    {{ review[2] }}
+
+                </p>
+
+                <small>
+
+                    {{ review[3] }}
+
+                </small>
+
+            </div>
+
+            {% endfor %}
+
+        {% else %}
+
+            <p style="text-align:center">
+
+                No reviews yet.
+
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    {% if session.get('user_id') %}
+
+        <div class="review-form">
+
+            <h3>Write a Review</h3>
+
+            <form
+                action="/submit_review/{{ selected_product.product_id }}"
+                method="POST"
+            >
+
+                <select
+                    name="rating"
+                    required
+                >
+
+                    <option value="">
+                        Select Rating
+                    </option>
+
+                    <option value="5">★★★★★</option>
+                    <option value="4">★★★★☆</option>
+                    <option value="3">★★★☆☆</option>
+                    <option value="2">★★☆☆☆</option>
+                    <option value="1">★☆☆☆☆</option>
+
+                </select>
+
+                <textarea
+                    name="review_text"
+                    placeholder="Share your experience..."
+                    required
+                ></textarea>
+
+                <button
+                    type="submit"
+                    class="buy-btn"
+                >
+                    Submit Review
+                </button>
+
+            </form>
+
+        </div>
+
+        {% endif %}
+</div>
+</body>
+
+</html>

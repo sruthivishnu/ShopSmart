@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>
+
+        Search Results
+
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <div class="logo">
+
+        ShopSmart
+
+    </div>
+
+    <div class="nav-links">
+
+        <a href="/" class="home-btn">
+            Home
+        </a>
+
+        <a href="javascript:history.back()"
+           class="home-btn">
+            Back
+        </a>
+
+    </div>
+
+</div>
+
+<div class="results-header">
+
+    <h1 class="section-title">
+
+        Search Results for
+        "{{ query }}"
+
+    </h1>
+
+    <p class="results-count">
+
+        {{ products|length }}
+        products found
+
+    </p>
+
+</div>
+
+<div class="category-products-grid">
+
+    {% for product in products %}
+
+    <div class="product-card">
+
+        <a
+            href="/recommend/{{ product.product_id }}"
+        >
+
+            <img
+                src="{{ url_for(
+                    'static',
+                    filename=product.image
+                ) }}"
+                class="product-image"
+            >
+
+        </a>
+
+        <h3 class="product-title">
+
+            {{ product.product_name }}
+
+        </h3>
+
+        <p class="product-category">
+
+            {{ product.category }}
+
+        </p>
+
+        <p class="product-price">
+
+            ₹{{ "{:,}".format(product.price) }}
+
+        </p>
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+</body>
+
+</html>

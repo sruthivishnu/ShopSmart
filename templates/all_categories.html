@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html>
+
+
+<head>
+
+    <title>All Categories</title>
+
+    <link
+        rel="stylesheet"
+        href="{{ url_for(
+            'static',
+            filename='css/style.css'
+        ) }}"
+    >
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <a href="/" class="logo">
+        Shop<span>Smart</span>
+    </a>
+
+    <div class="nav-buttons">
+
+        <a href="/" class="nav-btn">
+            Home
+        </a>
+
+        <button
+            class="nav-btn"
+            onclick="history.back()"
+            type="button">
+
+            Back
+
+        </button>
+
+    </div>
+
+</div>
+
+<h1 class="section-title">
+
+    All Categories
+
+</h1>
+<div class="category-grid">
+
+{% for category in categories %}
+
+<a
+    href="/category/general/{{ category }}"
+    class="category-card"
+>
+
+    {% if category == "Men Fashion" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/men.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Women Fashion" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/women.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Kids Fashion" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/kids.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Footwear" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/footwear.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Furniture" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/furniture.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Pet Supplies" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/pets.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Sports" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/sports.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Bags & Wallets" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/bags.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Jewellery" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/jewellery.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Watches" %}
+
+        <img
+        src="{{ url_for(
+        'static',
+        filename='images/categories/watches.jpg'
+        ) }}"
+
+    class="category-image"
+
+    >
+
+    {% elif category == "Beauty & Personal Care" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/beauty.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Pens & Stationery" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/pens.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Home Furnishing" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/home.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Home Decor" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/decor.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Automotive" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/automotive.jpg') }}"
+            class="category-image"
+        >
+
+    {% elif category == "Tools & Hardware" %}
+
+        <img
+            src="{{ url_for('static',
+            filename='images/categories/tools.jpg') }}"
+            class="category-image"
+        >
+
+    {% endif %}
+
+    <span>{{ category }}</span>
+
+</a>
+
+{% endfor %}
+
+</div>
+
+</body>
+
+</html>

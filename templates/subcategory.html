@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>{{ category_name }}</title>
+
+    <link
+            rel="stylesheet"
+            href="{{ url_for('static',
+            filename='css/style.css') }}"
+    >
+
+    <link
+            rel="stylesheet"
+            href="{{ url_for('static',
+            filename='css/subcategory.css') }}"
+    >
+
+</head>
+
+<body>
+
+<!-- ===========================
+     NAVBAR
+=========================== -->
+
+<header class="sub-navbar">
+
+    <a href="/" class="logo">
+
+        Shop<span>Smart</span>
+
+    </a>
+
+    <div class="nav-buttons">
+
+        <a href="/" class="nav-btn">
+
+            Home
+
+        </a>
+
+        <a
+                href="javascript:history.back()"
+                class="nav-btn"
+        >
+
+            Back
+
+        </a>
+
+    </div>
+
+</header>
+
+<!-- ===========================
+        HERO
+=========================== -->
+
+<section
+    class="hero"
+    style="background-image:linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.45)),url('{{ hero_image }}');"
+>
+
+    <div class="hero-content">
+
+        <span class="hero-tag">
+
+    {{ category_name.upper() }}
+
+</span>
+
+<h1>
+
+    Explore {{ category_name }}
+
+</h1>
+
+        <p>
+
+            Browse our latest collections carefully selected
+            for every style and occasion.
+
+        </p>
+
+        <a
+                href="#collections"
+                class="hero-btn"
+        >
+
+            Browse Collections →
+
+        </a>
+
+    </div>
+
+</section>
+
+<!-- ===========================
+     TITLE
+=========================== -->
+
+<section class="section-header">
+
+    <h2>
+
+        Browse Collections
+
+    </h2>
+
+    <p>
+
+        Select a collection to explore products.
+
+    </p>
+
+</section>
+
+<!-- ===========================
+     COLLECTIONS
+=========================== -->
+
+<section
+        id="collections"
+        class="subcategory-grid"
+>
+
+{% for item in subcategories %}
+
+<a
+
+href="{{ url_for(
+
+'category_subtype',
+
+gender=gender,
+
+product_type=item.type
+
+) }}"
+
+class="subcategory-card"
+
+>
+
+<div class="subcategory-image">
+
+<img
+
+src="{{ url_for(
+    'static',
+    filename='images/subcategories/' + item.image
+) }}"
+
+class="subcategory-image"
+
+onerror="this.src='{{ url_for(
+'static',
+filename='images/subcategories/default.jpg'
+) }}'"
+
+>
+
+</div>
+
+<div class="subcategory-info">
+
+<h3>
+
+{{ item.type.replace("_"," ").title() }}
+
+</h3>
+
+<p>
+
+{{ item.count }}
+
+Products
+
+</p>
+<span class="explore-btn">
+
+Explore Collection →
+
+</span>
+
+</div>
+
+</a>
+
+{% endfor %}
+
+</section>
+
+<!-- ===========================
+ SALE
+=========================== -->
+
+<section class="offer-banner">
+
+<div>
+
+<h2>
+
+Summer Fashion Sale
+
+</h2>
+
+<p>
+
+Up to 60% OFF
+
+</p>
+
+</div>
+
+<div>
+
+<h2>
+
+Premium Brands
+
+</h2>
+
+<p>
+
+Latest Collections
+
+</p>
+
+</div>
+
+</section>
+
+<!-- ===========================
+FEATURES
+=========================== -->
+
+<section class="features">
+
+<div>
+
+🚚
+
+<h4>
+
+Fast Delivery
+
+</h4>
+
+<p>
+
+Across India
+
+</p>
+
+</div>
+
+<div>
+
+💳
+
+<h4>
+
+Secure Payment
+
+</h4>
+
+<p>
+
+100% Safe
+
+</p>
+
+</div>
+
+<div>
+
+↩️
+
+<h4>
+
+Easy Returns
+
+</h4>
+
+<p>
+
+7 Days
+
+</p>
+
+</div>
+
+<div>
+
+⭐
+
+<h4>
+
+Top Quality
+
+</h4>
+
+<p>
+
+Verified Products
+
+</p>
+
+</div>
+
+</section>
+
+<footer class="subcategory-footer">
+
+© 2026 ShopSmart
+
+</footer>
+
+</body>
+
+</html>

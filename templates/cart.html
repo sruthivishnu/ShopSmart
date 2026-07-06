@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Shopping Cart</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static',
+          filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<div class="navbar">
+
+    <div class="logo">
+
+        ShopSmart
+
+    </div>
+
+    <div>
+
+        <a href="/" class="home-btn">
+
+            Home
+
+        </a>
+
+        <a href="/cart" class="cart-link">
+
+            🛒 Cart
+
+            <span class="cart-badge">
+
+                {{ cart_count }}
+
+            </span>
+
+        </a>
+
+        <a href="/orders" class="home-btn">
+
+            My Orders
+
+        </a>
+
+        <a href="/logout" class="home-btn">
+
+            Logout
+
+        </a>
+
+    </div>
+
+</div>
+
+<div class="main-container">
+    {% if not products %}
+
+<div class="empty-cart">
+
+    <div class="empty-cart-icon">
+
+        🛒
+
+    </div>
+
+    <h2>
+
+        Your Cart is Empty
+
+    </h2>
+
+    <p>
+
+        Looks like you haven't added anything yet.
+
+    </p>
+
+    <a href="/"
+
+       class="footer-btn">
+
+        Continue Shopping
+
+    </a>
+
+</div>
+
+{% else %}
+
+    <div class="cart-header">
+
+    <h1>
+
+        🛒 Shopping Cart
+
+    </h1>
+
+    <p>
+
+        {{ products|length }} Item(s) in your cart
+
+    </p>
+
+</div>
+
+    {% for item in products %}
+
+    <div class="selected-product">
+
+        <img
+            src="{{ url_for('static',
+            filename=item.image) }}"
+            class="selected-image"
+        >
+
+        <div class="selected-details">
+
+            <h3>
+
+                {{ item.product_name }}
+
+            </h3>
+
+            <p>
+
+                Price:
+                ₹{{ "{:,}".format(item.price) }}
+
+            </p>
+
+            <div class="quantity-controls">
+
+                <a
+                    href="/decrease_quantity/{{ item.product_id }}"
+                    class="qty-btn"
+                >
+
+                    -
+
+                </a>
+
+                <span class="qty-number">
+
+                    {{ item.quantity }}
+
+                </span>
+
+                <a
+                    href="/increase_quantity/{{ item.product_id }}"
+                    class="qty-btn"
+                >
+
+                    +
+
+                </a>
+
+            </div>
+
+            <p>
+
+                Subtotal:
+                ₹{{ "{:,}".format(item.subtotal) }}
+
+            </p>
+
+            <a
+                href="/remove_from_cart/{{ item.product_id }}"
+                class="remove-btn"
+            >
+
+                Remove
+
+            </a>
+
+        </div>
+
+    </div>
+
+    {% endfor %}
+
+    <div class="cart-summary">
+
+    <h2>
+
+        Order Summary
+
+    </h2>
+
+    <div class="summary-row">
+
+        <span>Total Items</span>
+
+        <span>{{ products|length }}</span>
+
+    </div>
+
+    <div class="summary-row">
+
+        <span>Shipping</span>
+
+        <span class="free-text">
+
+            FREE
+
+        </span>
+
+    </div>
+
+    <hr>
+
+    <div class="summary-total">
+
+        <span>Total</span>
+
+        <span>
+
+            ₹{{ "{:,}".format(total) }}
+
+        </span>
+
+    </div>
+
+    <a href="/checkout"
+
+       class="checkout-btn">
+
+        Proceed to Checkout →
+
+    </a>
+
+</div>
+    {% endif %}
+</div>
+
+</body>
+
+</html>

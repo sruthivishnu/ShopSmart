@@ -1,0 +1,265 @@
+/* ==========================================
+   UNIVERSAL SHOPSMART NAVBAR
+========================================== */
+
+.navbar{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:18px 40px;
+
+    background:linear-gradient(90deg,#0f172a,#312e81);
+
+    box-shadow:0 5px 20px rgba(0,0,0,.18);
+
+}
+
+/* LEFT */
+
+.nav-left{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.nav-logo{
+
+    text-decoration:none;
+
+    color:white;
+
+    font-size:32px;
+
+    font-weight:800;
+
+}
+
+.nav-logo span{
+
+    color:#ffb400;
+
+}
+
+.nav-tagline{
+
+    color:#cbd5e1;
+
+    font-size:13px;
+
+    margin-top:3px;
+
+}
+
+/* CENTER */
+
+.nav-center{
+
+    display:flex;
+
+    gap:12px;
+
+    align-items:center;
+
+}
+
+.nav-item{
+
+    text-decoration:none;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    transition:.3s;
+
+    font-weight:600;
+
+}
+
+.nav-item:hover{
+
+    background:#ffb400;
+
+    color:#111827;
+
+}
+
+/* RIGHT */
+
+.nav-right{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.welcome-box{
+
+    color:white;
+
+    font-size:15px;
+
+}
+
+.nav-btn{
+
+    text-decoration:none;
+
+    background:#ff9900;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+.nav-btn:hover{
+
+    background:#e67e00;
+
+}
+
+.logout-btn{
+
+    text-decoration:none;
+
+    background:#ef4444;
+
+    color:white;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+.logout-btn:hover{
+
+    background:#dc2626;
+
+}
+
+/* CART */
+
+.cart-link{
+
+    position:relative;
+
+}
+
+.cart-badge{
+
+    position:absolute;
+
+    top:-8px;
+
+    right:-8px;
+
+    background:#ef4444;
+
+    color:white;
+
+    min-width:20px;
+
+    height:20px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:11px;
+
+    font-weight:bold;
+
+}
+
+/* MOBILE */
+
+@media(max-width:1000px){
+
+.navbar{
+
+    flex-direction:column;
+
+    gap:18px;
+
+    padding:20px;
+
+}
+
+.nav-center{
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+}
+
+.nav-right{
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+}
+
+}
+
+@media(max-width:650px){
+
+.nav-logo{
+
+    font-size:28px;
+
+}
+
+.nav-item,
+.nav-btn,
+.logout-btn{
+
+    padding:9px 14px;
+
+    font-size:14px;
+
+}
+
+.welcome-box{
+
+    width:100%;
+
+    text-align:center;
+
+}
+
+}

@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+```
+<title>
+    Ecommerce Recommendation System
+</title>
+
+<link
+    rel="stylesheet"
+    href="{{ url_for(
+        'static',
+        filename='css/style.css'
+    ) }}"
+>
+```
+
+</head>
+
+<body id="top">
+
+```
+<!-- NAVBAR -->
+
+<div class="navbar">
+
+    <a href="/" class="logo">
+    Shop<span>Smart</span>
+</a>
+
+    <div class="nav-links">
+
+        {% if session.get('user_id') %}
+
+            <span class="welcome-user">
+
+                Welcome {{ session.get('username') }}
+
+            </span>
+
+            <a href="/cart" class="cart-link">
+
+                🛒 Cart
+
+                <span class="cart-badge">
+
+                    {{ cart_count }}
+
+                </span>
+
+            </a>
+
+            <a href="/orders" class="home-btn">
+
+                My Orders
+
+            </a>
+
+            <a href="/logout" class="home-btn">
+
+                Logout
+
+            </a>
+
+        {% else %}
+
+            <a href="/login" class="home-btn">
+
+                Login
+
+            </a>
+
+            <a href="/signup" class="home-btn">
+
+                Sign Up
+
+            </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+<!-- MAIN CONTENT -->
+
+<div class="main-container">
+
+    <div class="hero-banner">
+
+        <div class="hero-content">
+
+            <h1>
+                Shop Smarter with AI
+            </h1>
+
+            <p>
+                Discover Fashion, Electronics, Furniture and More with Personalized Recommendations
+            </p>
+
+            <div class="hero-buttons">
+
+                <a href="#shop-by-category" class="hero-btn">
+                    Explore Categories
+                </a>
+
+                <a href="/category/fashion" class="hero-btn-secondary">
+                    Explore Fashion
+                </a>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="search-container">
+
+        <input
+            type="text"
+            id="search-box"
+            placeholder="Search products like laptops, shirts, bags..."
+            autocomplete="off"
+        >
+
+        <div id="suggestions"></div>
+
+    </div>
+
+
+
+    <h2
+        id="shop-by-category"
+        class="section-title"
+    >
+
+        Shop By Category
+
+    </h2>
+
+    <div class="category-grid">
+
+        <a href="/category/men" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/men.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Men Fashion</span>
+
+        </a>
+
+        <a href="/category/women" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/women.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Women Fashion</span>
+
+        </a>
+
+        <a href="/category/kids" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/kids.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Kids Fashion</span>
+
+        </a>
+
+        <a href="/category/footwear" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/footwear.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Footwear</span>
+
+        </a>
+
+        <a href="/category/bags" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/bags.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Bags & Wallets</span>
+
+        </a>
+
+        <a href="/category/furniture" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/furniture.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Furniture</span>
+
+        </a>
+
+        <a href="/category/pets" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/pets.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Pet Supplies</span>
+
+        </a>
+
+        <a href="/category/sports" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/sports.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Sports</span>
+
+        </a>
+
+        <a href="/category/watches" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/watches.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Watches</span>
+
+        </a>
+
+        <a href="/category/jewellery" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/jewellery.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Jewellery</span>
+
+        </a>
+
+        <a href="/category/beauty" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/beauty.jpg') }}"
+                class="category-image"
+            >
+
+            <span>Beauty & Personal Care</span>
+
+        </a>
+
+        <a href="/category/all" class="category-card">
+
+            <img
+                src="{{ url_for('static',
+                filename='images/categories/all.jpg') }}"
+                class="category-image"
+            >
+
+            <span>View All Categories</span>
+
+        </a>
+
+    </div>
+
+    {% if recently_viewed_products %}
+
+    <h2 class="section-title">
+
+        🕒 Continue Shopping
+
+    </h2>
+
+    <div class="horizontal-scroll">
+
+        {% for item in recently_viewed_products %}
+
+        <div class="product-card">
+
+            <a href="{{ url_for(
+                'recommend',
+                product_id=item.product_id
+            ) }}">
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=item.image
+                    ) }}"
+                    class="product-image"
+                >
+
+            </a>
+
+            <h3 class="product-title">
+
+                {{ item.product_name }}
+
+            </h3>
+
+            <p class="product-category">
+
+                {{ item.category }}
+
+            </p>
+
+            <p class="product-price">
+
+                ₹{{ "{:,}".format(item.price) }}
+
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+    {% if personal_recommendations %}
+
+    <h2 class="section-title">
+
+        ✨ Recommended For You
+
+    </h2>
+
+    <div class="horizontal-scroll">
+
+        {% for item in personal_recommendations %}
+
+        <div class="product-card">
+
+            <a href="{{ url_for(
+                'recommend',
+                product_id=item.product_id
+            ) }}">
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=item.image
+                    ) }}"
+                    class="product-image"
+                >
+
+            </a>
+
+            <h3 class="product-title">
+
+                {{ item.product_name }}
+
+            </h3>
+
+            <p class="product-category">
+
+                {{ item.category }}
+
+            </p>
+
+            <p class="product-price">
+
+                ₹{{ "{:,}".format(item.price) }}
+
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+    {% if purchase_history %}
+
+    <h2 class="section-title">
+
+        🔁 Buy It Again
+
+    </h2>
+
+    <div class="horizontal-scroll">
+
+        {% for product in purchase_history %}
+
+        <div class="product-card">
+
+            <a href="{{ url_for(
+                'recommend',
+                product_id=product.product_id
+            ) }}">
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=product.image
+                    ) }}"
+                    class="product-image"
+                >
+
+            </a>
+
+            <h3 class="product-title">
+
+                {{ product.product_name }}
+
+            </h3>
+
+            <p class="product-price">
+
+                ₹{{ "{:,}".format(product.price) }}
+
+            </p>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+    <div class="amazon-row">
+
+        <div class="amazon-card">
+
+            <h3>🔥 Deals Under ₹2000</h3>
+
+            <div class="amazon-products">
+
+                {% for item in top_deals %}
+
+                <a href="{{ url_for(
+                    'recommend',
+                    product_id=item.product_id
+                ) }}">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=item.image
+                        ) }}"
+                        class="amazon-mini-image"
+                    >
+
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+            <a href="/search?q=under+2000"
+               class="amazon-link">
+
+                See More →
+
+            </a>
+
+        </div>
+
+        <div class="amazon-card">
+
+            <h3>🔥 Hot Picks</h3>
+
+            <div class="amazon-products">
+
+                {% for item in trending_products %}
+
+                <a href="{{ url_for(
+                    'recommend',
+                    product_id=item.product_id
+                ) }}">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=item.image
+                        ) }}"
+                        class="amazon-mini-image"
+                    >
+
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+            <a href="/search?q=trending"
+               class="amazon-link">
+
+                Explore Picks →
+
+            </a>
+
+        </div>
+
+        <div class="amazon-card">
+
+            <h3>✨ Lifestyle Picks</h3>
+
+            <div class="amazon-products">
+
+                {% for item in beauty_products %}
+
+                <a href="{{ url_for(
+                    'recommend',
+                    product_id=item.product_id
+                ) }}">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=item.image
+                        ) }}"
+                        class="amazon-mini-image"
+                    >
+
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+            <a href="/category/beauty"
+                class="amazon-link">
+
+                Explore More →
+
+            </a>
+
+        </div>
+
+        <div class="amazon-card">
+
+            <h3>👗 Fashion Deals</h3>
+
+            <div class="amazon-products">
+
+                {% for item in fashion_deals %}
+
+                <a href="{{ url_for(
+                    'recommend',
+                    product_id=item.product_id
+                ) }}">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=item.image
+                        ) }}"
+                        class="amazon-mini-image"
+                    >
+
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+            <a href="/category/fashion"
+               class="amazon-link">
+                Explore More →
+            </a>
+
+        </div>
+    </div>
+
+    <div class="amazon-row">
+
+        <div class="amazon-card">
+
+            <h3>👟 Trending Footwear</h3>
+
+            <div class="amazon-products">
+
+                {% for item in footwear_products %}
+
+                <a href="{{ url_for(
+                    'recommend',
+                    product_id=item.product_id
+                ) }}">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=item.image
+                        ) }}"
+                        class="amazon-mini-image"
+                    >
+
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+            <a href="/category/footwear"
+               class="amazon-link">
+
+                Explore More →
+
+            </a>
+
+        </div>
+
+        <div class="amazon-card">
+
+            <h3>👜 Bags & Wallets</h3>
+
+            <div class="amazon-products">
+
+                {% for item in bags_products %}
+
+                <a href="{{ url_for(
+                    'recommend',
+                    product_id=item.product_id
+                ) }}">
+
+                    <img
+                        src="{{ url_for(
+                            'static',
+                            filename=item.image
+                        ) }}"
+                        class="amazon-mini-image"
+                    >
+
+                </a>
+
+                {% endfor %}
+
+            </div>
+
+            <a href="/category/bags"
+               class="amazon-link">
+
+                Explore More →
+
+            </a>
+
+        </div>
+
+
+
+    <!-- FURNITURE -->
+
+    <div class="amazon-card">
+
+        <h3>🛋 Furniture</h3>
+
+        <div class="amazon-products">
+
+            {% for item in furniture_products %}
+
+            <a href="{{ url_for(
+                'recommend',
+                product_id=item.product_id
+            ) }}">
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=item.image
+                    ) }}"
+                    class="amazon-mini-image"
+                >
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+        <a href="/category/furniture"
+           class="amazon-link">
+
+            Explore More →
+
+        </a>
+
+    </div>
+
+    <!-- SPORTS -->
+
+    <div class="amazon-card">
+
+        <h3>⌚ Premium Watches</h3>
+
+        <div class="amazon-products">
+
+            {% for item in watch_products %}
+
+            <a href="{{ url_for(
+                'recommend',
+                product_id=item.product_id
+            ) }}">
+
+                <img
+                    src="{{ url_for(
+                        'static',
+                        filename=item.image
+                    ) }}"
+                    class="amazon-mini-image"
+                >
+
+            </a>
+
+            {% endfor %}
+
+        </div>
+
+        <a href="/category/watches"
+           class="amazon-link">
+
+            Explore More →
+
+        </a>
+
+    </div>
+
+</div>
+
+
+
+
+    {% if search_results is not none %}
+
+        <h2 class="section-title">
+
+            Search Results
+
+        </h2>
+
+        <div class="horizontal-scroll">
+
+            {% for item in search_results.to_dict('records') %}
+
+                <div class="product-card">
+
+                    <a href="{{ url_for('recommend', product_id=item.product_id) }}">
+
+                        <img
+                            src="{{ url_for('static', filename=item.image) }}"
+                            class="product-image"
+                        >
+
+                    </a>
+
+                    <h3 class="product-title">
+
+                        {{ item.product_name }}
+
+                    </h3>
+
+                    <p class="product-category">
+
+                        {{ item.category }}
+
+                    </p>
+
+                    <p class="product-price">
+
+                        ₹{{ "{:,}".format(item.price) }}
+
+                    </p>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+```
+
+<!-- CHATBOT BUTTON -->
+
+<div id="chatbot-button">
+
+    💬
+
+</div>
+
+<!-- CHAT WINDOW -->
+
+<div id="chatbot-window">
+
+    <div id="chatbot-header">
+
+        <span>
+
+            ShopSmart Assistant
+
+        </span>
+
+        <span id="chat-close">
+
+            ✖
+
+        </span>
+
+    </div>
+
+    <div id="chatbot-messages">
+
+        <div class="bot-message">
+
+            Hello! How can I help you today?
+
+        </div>
+
+    </div>
+
+    <div id="chatbot-input-area">
+
+        <input
+            type="text"
+            id="chat-input"
+            placeholder="Ask something..."
+        >
+
+        <button id="send-btn">
+
+            Send
+
+        </button>
+
+    </div>
+
+</div>
+
+<!-- ==========================
+     FOOTER
+========================== -->
+
+<footer class="footer">
+
+    {% if session.get('user_id') %}
+
+    <div class="footer-top">
+
+        <h2>
+
+            Ready to discover your next favorite product?
+
+        </h2>
+
+        <a href="#shop-by-category" class="footer-btn">
+
+            Explore Categories
+
+        </a>
+
+    </div>
+
+    {% else %}
+
+    <div class="footer-top">
+
+        <h2>
+
+            Unlock Personalized Recommendations
+
+        </h2>
+
+        <a href="/login" class="footer-btn">
+
+            Login
+
+        </a>
+
+        <p>
+
+            New customer?
+
+            <a href="/signup">
+
+                Create an account
+
+            </a>
+
+        </p>
+
+    </div>
+
+    {% endif %}
+
+    <div class="footer-links">
+
+        <a href="/">Home</a>
+
+        <a href="/category/all">Categories</a>
+
+        <a href="/cart">Cart</a>
+
+        <a href="/orders">Orders</a>
+
+    </div>
+
+    <div class="footer-bottom">
+
+        <p>
+
+            © 2026 <strong>ShopSmart</strong>
+
+        </p>
+
+        <p>
+
+            AI Powered E-Commerce Recommendation System
+
+        </p>
+
+        <a href="#top">
+
+            ↑ Back to Top
+
+        </a>
+
+    </div>
+
+</footer>
+
+<script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
+</body>
+
+</html>

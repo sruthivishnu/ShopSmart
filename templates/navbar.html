@@ -1,0 +1,133 @@
+<nav class="navbar">
+
+    <!-- ===========================
+         LOGO
+    ============================ -->
+
+    <div class="nav-left">
+
+        <a href="{{ url_for('home') }}" class="nav-logo">
+
+            🛍 <span>Shop</span>Smart
+
+        </a>
+
+        <div class="nav-tagline">
+
+            Smart Shopping Starts Here
+
+        </div>
+
+    </div>
+
+
+    <!-- ===========================
+         CENTER MENU
+    ============================ -->
+
+    <div class="nav-center">
+
+        <a href="{{ url_for('home') }}" class="nav-item">
+
+            🏠 Home
+
+        </a>
+
+        {% if page != "login" and page != "signup" %}
+
+        <a href="{{ url_for('all_categories') }}" class="nav-item">
+
+            📂 Categories
+
+        </a>
+
+        {% endif %}
+
+        {% if page != "home" %}
+
+        <a href="javascript:history.back()" class="nav-item">
+
+            ← Back
+
+        </a>
+
+        {% endif %}
+
+        {% if session.get("user_id") and page != "cart" %}
+
+        <a href="{{ url_for('cart') }}" class="nav-item cart-link">
+
+            🛒 Cart
+
+            {% if cart_count|default(0) > 0 %}
+
+            <span class="cart-badge">
+
+                {{ cart_count }}
+
+            </span>
+
+            {% endif %}
+
+        </a>
+
+        {% endif %}
+
+        {% if session.get("user_id") and page != "orders" %}
+
+        <a href="{{ url_for('orders') }}" class="nav-item">
+
+            📦 Orders
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- ===========================
+         RIGHT SIDE
+    ============================ -->
+
+    <div class="nav-right">
+
+        {% if session.get("user_id") %}
+
+        <div class="welcome-box">
+
+            👋 Welcome,
+
+            <strong>
+
+                {{ session.get("username") }}
+
+            </strong>
+
+        </div>
+
+        <a href="{{ url_for('logout') }}" class="logout-btn">
+
+            Logout
+
+        </a>
+
+        {% else %}
+
+        <a href="{{ url_for('login') }}" class="nav-btn">
+
+            Login
+
+        </a>
+
+        <a href="{{ url_for('signup') }}" class="nav-btn">
+
+            Sign Up
+
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</nav>
