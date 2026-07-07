@@ -39,12 +39,23 @@ transactions_df = transactions_df[
 print("Products Used :", len(valid_products))
 
 # -----------------------------------
-# CREATE BASKET
+# CREATE MEMORY-EFFICIENT BASKET
 # -----------------------------------
 
-basket = pd.crosstab(
-    transactions_df["transaction_id"],
-    transactions_df["product_id"]
+transactions_df["value"] = True
+
+basket = transactions_df.pivot_table(
+
+    index="transaction_id",
+
+    columns="product_id",
+
+    values="value",
+
+    aggfunc="max",
+
+    fill_value=False
+
 )
 
 basket = basket.astype(bool)
@@ -82,12 +93,30 @@ rules_filtered = rules[
 print("Filtered Rules:", len(rules_filtered))
 
 # -----------------------------------
-# SAVE MODEL
+# SAVE MODEL (Portable Format)
 # -----------------------------------
+
 MODEL_PATH = Path(__file__).resolve().parent / "apriori_rules.pkl"
 
+portable_rules = []
+
+for _, row in rules_filtered.iterrows():
+
+    portable_rules.append({
+
+        "antecedents": list(row["antecedents"]),
+
+        "consequents": list(row["consequents"]),
+
+        "confidence": float(row["confidence"]),
+
+        "lift": float(row["lift"])
+
+    })
+
 with open(MODEL_PATH, "wb") as f:
-    pickle.dump(rules_filtered, f)
+
+    pickle.dump(portable_rules, f)
 
 print(f"Apriori model saved successfully: {MODEL_PATH}")
 

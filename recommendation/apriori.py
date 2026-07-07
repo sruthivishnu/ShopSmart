@@ -10,6 +10,7 @@ from recommendation.model import products_df
 MODEL_PATH = Path(__file__).parent / "apriori_rules.pkl"
 
 with open(MODEL_PATH, "rb") as f:
+
     rules_filtered = pickle.load(f)
 
 print(f"Loaded {len(rules_filtered)} Apriori rules.")
@@ -23,29 +24,22 @@ def get_apriori_recommendations(product_id, top_n=15):
     print("\nPRODUCT ID =", product_id)
     print("PRODUCT TYPE =", type(product_id))
 
-    relevant_rules = rules_filtered[
-        rules_filtered["antecedents"].apply(
-            lambda x: product_id in x
-        )
+    relevant_rules = [
+
+        rule
+
+        for rule in rules_filtered
+
+        if product_id in rule["antecedents"]
+
     ]
 
-    if len(rules_filtered) > 0:
-        sample = next(iter(rules_filtered.iloc[0]["antecedents"]))
-        print("SAMPLE RULE ITEM =", sample)
-        print("RULE ITEM TYPE =", type(sample))
     print("\n==========================")
     print("CURRENT PRODUCT ID :", product_id)
     print("MATCHING RULES :", len(relevant_rules))
-
-    if len(relevant_rules) > 0:
-        first_rule = relevant_rules.iloc[0]
-
-        print("FIRST ANTECEDENT :", first_rule["antecedents"])
-        print("FIRST CONSEQUENT :", first_rule["consequents"])
-
     print("==========================\n")
 
-    if relevant_rules.empty:
+    if not relevant_rules:
         return []
 
     current = products_df[
@@ -63,7 +57,7 @@ def get_apriori_recommendations(product_id, top_n=15):
 
     scored_products = {}
 
-    for _, rule in relevant_rules.iterrows():
+    for rule in relevant_rules:
 
         confidence = rule["confidence"]
         lift = rule["lift"]
