@@ -373,17 +373,24 @@ products_df["combined_features"] = (
 print("Combined features created:", round(time.time() - start, 2), "seconds")
 
 # -----------------------------------
-# TF-IDF VECTORIZATION
+# LOAD PRECOMPUTED TF-IDF MODEL
 # -----------------------------------
 
-vectorizer = TfidfVectorizer(
-    stop_words='english'
+import joblib
+
+vectorizer = joblib.load(
+    os.path.join(BASE_DIR, "tfidf_vectorizer.pkl")
 )
 
-feature_vectors = vectorizer.fit_transform(
-    products_df['combined_features']
+feature_vectors = joblib.load(
+    os.path.join(BASE_DIR, "feature_vectors.pkl")
 )
-print("TF-IDF completed:", round(time.time() - start, 2), "seconds")
+
+print(
+    "Precomputed TF-IDF loaded:",
+    round(time.time() - start, 2),
+    "seconds"
+)
 
 # -----------------------------------
 # FEATURE VECTORS READY
