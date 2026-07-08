@@ -125,6 +125,9 @@ app.config["MYSQL_PORT"] = int(
 
 mysql = MySQL(app)
 
+print("MYSQL_HOST =", app.config["MYSQL_HOST"])
+print("MYSQL_PORT =", app.config["MYSQL_PORT"])
+
 genai.configure(
     api_key=os.getenv("GEMINI_API_KEY")
 )
@@ -2119,6 +2122,8 @@ def login():
 
         email = request.form['email'].strip().lower()
         password = request.form['password']
+
+        print("Attempting MySQL connection...")
 
         cursor = mysql.connection.cursor()
 
