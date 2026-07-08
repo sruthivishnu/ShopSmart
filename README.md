@@ -1,89 +1,160 @@
 # 🛍️ ShopSmart
 
-An AI-powered E-Commerce Recommendation System built using **Flask**, **Machine Learning**, and **MySQL**.
+> **AI-Powered E-Commerce Recommendation System built with Flask, Machine Learning, and MySQL**
 
-ShopSmart provides intelligent product recommendations using a hybrid recommendation engine that combines content-based filtering, collaborative filtering, Apriori-based Frequently Bought Together recommendations, and personalized user recommendations.
+ShopSmart is a full-stack e-commerce web application that provides intelligent product recommendations using a **Hybrid Recommendation Engine**. It combines **Content-Based Filtering**, **Collaborative Filtering**, and **Apriori Association Rules** to deliver personalized shopping experiences.
 
----
-
-# ✨ Features
-
-- Personalized product recommendations
-- Similar Products recommendation engine
-- Frequently Bought Together recommendations
-- Trending & Hot Picks
-- Category-based shopping
-- Smart product search
-- Search autocomplete
-- Shopping Cart
-- Order Management
-- User Authentication
-- Product Reviews & Ratings
-- Gemini AI Chatbot
-- Responsive user interface
+The application also includes smart search, category browsing, shopping cart, order management, product reviews, and an AI-powered chatbot, making it a complete end-to-end shopping platform.
 
 ---
 
-# 🧠 Recommendation Engine
+# 📸 Application Preview
 
-The recommendation system combines multiple techniques:
+## 🏠 Homepage
 
-- Content-Based Filtering (TF-IDF + Cosine Similarity)
-- Collaborative Filtering
-- Apriori Association Rules
-- Personalized Recommendations
-- Recently Viewed Products
-- Hybrid Ranking Engine
+![Homepage](static/screenshots/homepage.png)
+
+---
+
+## 📦 Product Recommendation
+
+Features displayed:
+
+- Product Details
+- Similar Products
+- Frequently Bought Together
+- Trending Products
+- Customer Reviews
+
+![Product Page](static/screenshots/product-page.png)
+
+---
+
+## 🛍️ Category Collections
+
+Browse premium collections with dedicated category pages.
+
+![Category Page](static/screenshots/category-page.png)
+
+---
+
+## 🔍 Smart Search
+
+Fast product search with category-aware filtering.
+
+![Search Page](static/screenshots/search-page.png)
+
+---
+
+# ✨ Key Features
+
+- 🤖 Hybrid Recommendation Engine
+- 🧠 Content-Based Recommendations (TF-IDF + Cosine Similarity)
+- 👥 Collaborative Filtering
+- 🛒 Frequently Bought Together (Apriori Algorithm)
+- ❤️ Personalized Recommendations
+- 🔍 Smart Product Search
+- ⚡ Search Autocomplete
+- 🛍️ Shopping Cart
+- 📦 Order Management
+- ⭐ Product Reviews & Ratings
+- 🤖 Gemini AI Chatbot
+- 📱 Responsive User Interface
+- 🔐 User Authentication
+- 🗂️ Category-Based Shopping
+
+---
+
+# 🧠 Recommendation Engine Architecture
+
+```
+                        User
+
+                          │
+
+                          ▼
+
+                  Product Selected
+
+                          │
+
+          ┌───────────────┼───────────────┐
+
+          ▼               ▼               ▼
+
+   Content-Based    Collaborative      Apriori
+
+     Filtering        Filtering         FBT
+
+          └───────────────┼───────────────┘
+
+                          ▼
+
+                Hybrid Ranking Engine
+
+                          ▼
+
+             Personalized Recommendations
+```
 
 ---
 
 # 🛠️ Technology Stack
 
-## Backend
+### Backend
 
 - Python
 - Flask
 - MySQL
 
-## Machine Learning
+### Machine Learning
 
 - Pandas
 - NumPy
 - Scikit-Learn
 - MLxtend
 
-## Frontend
+### Frontend
 
 - HTML
 - CSS
 - JavaScript
-- Jinja2 Templates
+- Jinja2
+
+### Tools
+
+- Git
+- GitHub
+- PyCharm
 
 ---
 
 # 📂 Project Structure
 
 ```
-ShopSmart/
+ShopSmart
 │
 ├── recommendation/
 │   ├── hybrid.py
-│   ├── content.py
 │   ├── collaborative.py
+│   ├── content.py
 │   ├── apriori.py
 │   ├── frequently_bought.py
 │   ├── user_recommendation.py
+│   ├── chatbot.py
 │   └── ...
 │
 ├── static/
 │   ├── css/
 │   ├── images/
-│   └── js/
+│   ├── js/
+│   └── screenshots/
 │
 ├── templates/
 │
 ├── app.py
 ├── requirements.txt
+├── .env
 └── README.md
 ```
 
@@ -111,52 +182,62 @@ python app.py
 
 ---
 
-# 📊 Dataset
-
-The project uses product and transaction datasets to generate recommendations.
-
-Main datasets include:
-
-- products_cleaned.csv
-- transactions.csv
-- users.csv
-- transactions_apriori.csv
-
----
-
 # 🔒 Environment Variables
 
-Create a `.env` file containing:
+Create a `.env` file.
 
 ```
 MYSQL_HOST=
+
 MYSQL_USER=
+
 MYSQL_PASSWORD=
+
 MYSQL_DB=
+
 SECRET_KEY=
+
 GEMINI_API_KEY=
 ```
 
 ---
 
-# 📈 Future Improvements
+# 📊 Project Highlights
 
-- Product recommendation analytics
-- User preference learning
-- Wishlist functionality
-- Payment gateway integration
-- Admin dashboard
-- Email notifications
-- Cloud deployment
+- Nearly **20,000 products**
+- Hybrid Recommendation Engine
+- Personalized Shopping Experience
+- Category-aware Recommendations
+- Smart Search & Autocomplete
+- Product Reviews
+- Shopping Cart
+- Order Management
+- Responsive UI
 
 ---
 
-# 👩‍💻 Developed By
+# 🚀 Future Improvements
+
+- Admin Dashboard
+- Recommendation Analytics
+- Wishlist
+- Payment Gateway Integration
+- Email Notifications
+- Docker Support
+- Unit Testing
+- CI/CD Pipeline
+
+---
+
+# 👩‍💻 Developer
 
 **Sruthi Sukumaran P**
 
-Btech Graduate | Data Science Enthusiast
+Btech Graduate | Aspiring Data Scientist | Python & Machine Learning Enthusiast
+
+GitHub:
+https://github.com/sruthivishnu
 
 ---
 
-⭐ If you like this project, consider giving it a star!
+⭐ If you found this project interesting, consider giving it a star!

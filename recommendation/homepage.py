@@ -2,6 +2,13 @@ import re
 
 from recommendation.model import products_df
 
+# -----------------------------------
+# CACHED HOMEPAGE DATASET
+# Built once when the application starts
+# -----------------------------------
+
+HOMEPAGE_PRODUCTS = None
+
 import pandas as pd
 
 # -----------------------------------
@@ -9,6 +16,10 @@ import pandas as pd
 # -----------------------------------
 
 def get_homepage_products():
+    global HOMEPAGE_PRODUCTS
+
+    if HOMEPAGE_PRODUCTS is not None:
+        return HOMEPAGE_PRODUCTS
 
     valid_products = products_df[
         products_df["image"].notna()
@@ -36,7 +47,9 @@ def get_homepage_products():
         subset="product_id"
     )
 
-    return homepage_products.reset_index(drop=True)
+    HOMEPAGE_PRODUCTS = homepage_products.reset_index(drop=True)
+
+    return HOMEPAGE_PRODUCTS
 
 # -----------------------------------
 # REMOVE DUPLICATE PRODUCTS
