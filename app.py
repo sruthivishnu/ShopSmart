@@ -185,35 +185,41 @@ def home():
         'clothing'
     ]
 
+    import time
+
     used_ids = set()
 
+    t = time.time()
     top_deals, used_ids = get_top_deals(used_ids)
+    print("Top Deals:", round(time.time() - t, 2))
 
+    t = time.time()
     trending_products, used_ids = get_hot_picks(used_ids)
+    print("Hot Picks:", round(time.time() - t, 2))
 
-    footwear_products, used_ids = get_footwear_products(
-        used_ids
-    )
+    t = time.time()
+    footwear_products, used_ids = get_footwear_products(used_ids)
+    print("Footwear:", round(time.time() - t, 2))
 
-    bags_products, used_ids = get_bags_products(
-        used_ids
-    )
+    t = time.time()
+    bags_products, used_ids = get_bags_products(used_ids)
+    print("Bags:", round(time.time() - t, 2))
 
-    furniture_products, used_ids = get_furniture_products(
-        used_ids
-    )
+    t = time.time()
+    furniture_products, used_ids = get_furniture_products(used_ids)
+    print("Furniture:", round(time.time() - t, 2))
 
-    watch_products, used_ids = get_watch_products(
-        used_ids
-    )
+    t = time.time()
+    watch_products, used_ids = get_watch_products(used_ids)
+    print("Watches:", round(time.time() - t, 2))
 
-    beauty_products, used_ids = get_beauty_products(
-        used_ids
-    )
+    t = time.time()
+    beauty_products, used_ids = get_beauty_products(used_ids)
+    print("Beauty:", round(time.time() - t, 2))
 
-    fashion_deals, used_ids = get_fashion_deals(
-        used_ids
-    )
+    t = time.time()
+    fashion_deals, used_ids = get_fashion_deals(used_ids)
+    print("Fashion:", round(time.time() - t, 2))
 
     if request.method == 'POST':
 
