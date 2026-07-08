@@ -1,8 +1,9 @@
 import json
+import os
 import google.generativeai as genai
 
 genai.configure(
-    api_key="YOUR_API_KEY"
+    api_key=os.getenv("GEMINI_API_KEY")
 )
 
 model = genai.GenerativeModel(
