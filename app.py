@@ -72,6 +72,19 @@ from recommendation.chatbot_gemini import (
     get_gemini_response
 )
 
+from recommendation.chatbot_handlers import (
+    handle_personalized,
+    handle_orders,
+    handle_deals,
+    handle_greeting,
+    handle_help
+)
+
+from recommendation.chatbot_combo import (
+    handle_combo
+)
+
+
 import recommendation.chatbot_search
 
 from recommendation.homepage import (
@@ -2731,6 +2744,9 @@ def chat():
 
     query_type = route_query(message)
 
+    if query_type == "personalized":
+        return handle_personalized(mysql)
+
     # -----------------------------
     # FAQ
     # -----------------------------
@@ -2748,6 +2764,45 @@ def chat():
     print("USER MESSAGE :", message)
     print("QUERY TYPE   :", query_type)
     print("=" * 60)
+
+    # -----------------------------
+    # PERSONALIZED RECOMMENDATIONS
+    # -----------------------------
+
+    if query_type == "orders":
+        return handle_orders(mysql)
+
+    response = handle_deals(message)
+
+    if response:
+        return response
+
+    # -----------------------------
+    # GREETINGS
+    # -----------------------------
+
+    response = handle_greeting(message)
+
+    if response:
+        return response
+
+    # -----------------------------
+    # HELP
+    # -----------------------------
+
+    response = handle_help(message)
+
+    if response:
+        return response
+
+    # -----------------------------
+    # COMBO RECOMMENDATIONS
+    # -----------------------------
+
+    response = handle_combo(message)
+
+    if response:
+        return response
 
     # Shopping / Recommendation queries
     if query_type in [
@@ -2784,40 +2839,6 @@ def chat():
             return jsonify({
                 "reply": format_chatbot_products(results, intent)
             })
-
-
-    combo_words = [
-
-        "goes with",
-        "combo",
-        "accessories",
-        "pair with",
-        "buy with"
-
-    ]
-
-    is_combo_query = any(
-        word in message
-        for word in combo_words
-    )
-
-    # -----------------------------------------
-    # GREETING
-    # -----------------------------------------
-
-    if query_type == "greeting":
-        return jsonify({
-            "reply": get_greeting()
-        })
-
-    # -----------------------------------------
-    # HELP
-    # -----------------------------------------
-
-    if query_type == "help":
-        return jsonify({
-            "reply": get_help()
-        })
 
     # -----------------------------------------
     # GENERAL AI
@@ -2994,748 +3015,12 @@ def chat():
 
     print("USER MESSAGE =", message)
 
-    # -----------------------------
-    # PERSONALIZED RECOMMENDATIONS
-    # -----------------------------
-
-    if any(text in message for text in [
-        "recommend for me",
-        "what should i buy",
-        "suggest products for me"
-    ]):
-
-        if 'user_id' not in session:
-            return jsonify({
-                "reply":
-                    "Please login first to get personalized recommendations."
-            })
-
-        recommendations = get_user_recommendations(
-            session['user_id'],
-            mysql
-        )
-
-        if not recommendations:
-            return jsonify({
-                "reply":
-                    "I don't have enough purchase history yet. Buy a few products and I'll personalize recommendations for you."
-            })
-
-        reply = "<b>Recommended For You:</b><br><br>"
-
-        for product in recommendations[:5]:
-            reply += f"""
-            <div style='margin-bottom:15px;'>
-
-                <img
-                    src="/static/{product['image']}"
-                    width="80"
-                    height="80"
-                    style="border-radius:5px;"
-                    onerror="this.src='/static/images/no_image.jpg';"
-                >
-
-                <br><br>
-
-                ⭐ {product['product_name']}
-
-                <br>
-
-                💰 ₹{product['price']}
-
-                <br>
-
-                ⭐ Rating: {product['rating']}
-
-                <br><br>
-
-                <a
-                    href='/recommend/{product["product_id"]}'
-                    style='
-                        background:#ff9900;
-                        color:white;
-                        padding:6px 12px;
-                        text-decoration:none;
-                        border-radius:5px;
-                        display:inline-block;
-                    '
-                >
-                    View Product
-                </a>
-
-            </div>
-            """
-
-        return jsonify({
-            "reply": reply
-        })
-
-    # -----------------------------
-    # MY ORDERS / BUY AGAIN
-    # -----------------------------
-
-    if any(text in message for text in [
-
-        "my orders",
-        "what did i buy recently",
-        "recent purchases",
-        "buy again"
-
-    ]):
-
-        if 'user_id' not in session:
-            return jsonify({
-                "reply":
-                    "Please login first to view your purchase history."
-            })
-
-        cursor = mysql.connection.cursor()
-
-        cursor.execute(
-            '''
-            SELECT product_id
-            FROM orders
-            WHERE user_id=%s
-            ORDER BY order_date DESC
-            LIMIT 5
-            ''',
-            (session['user_id'],)
-        )
-
-        rows = cursor.fetchall()
-
-        cursor.close()
-
-        if not rows:
-            return jsonify({
-                "reply":
-                    "You haven't purchased any products yet."
-            })
-
-        reply = "<b>Your Recent Purchases:</b><br><br>"
-
-        for row in rows:
-
-            product_id = row[0]
-
-            product = products_df[
-                products_df['product_id']
-                == product_id
-                ]
-
-            if product.empty:
-                continue
-
-            product = product.iloc[0]
-
-            reply += f"""
-            <div style='margin-bottom:15px;'>
-
-                <img
-                    src="/static/{product['image']}"
-                    width="80"
-                    height="80"
-                    style="border-radius:5px;"
-                    onerror="this.src='/static/images/no_image.jpg';"
-                >
-
-                <br><br>
-
-                ⭐ {product['product_name']}
-
-                <br>
-
-                💰 ₹{product['price']}
-
-                <br><br>
-
-                <a
-                    href='/recommend/{product["product_id"]}'
-                    style='
-                        background:#ff9900;
-                        color:white;
-                        padding:6px 12px;
-                        text-decoration:none;
-                        border-radius:5px;
-                        display:inline-block;
-                    '
-                >
-                    View Product
-                </a>
-
-            </div>
-            """
-
-        return jsonify({
-            "reply": reply
-        })
-
-    # -----------------------------
-    # DEALS & TRENDING
-    # -----------------------------
-
-    if any(text in message for text in [
-
-        "today's deals",
-        "todays deals",
-        "show deals",
-        "best offers",
-        "offers"
-
-    ]):
-
-        deals = (
-
-            products_df[
-
-                (products_df['price'] < 2000)
-
-                &
-
-                products_df['product_name']
-                .str.contains(
-                    r'dress|kurta|jeans|watch|shoe|sandal|bag|perfume|lipstick',
-                    case=False,
-                    na=False,
-                    regex=True
-                )
-
-                ]
-
-                .sort_values(
-                by='rating',
-                ascending=False
-            )
-
-                .drop_duplicates(
-                subset='product_name'
-            )
-
-                .head(5)
-
-        )
-
-        reply = "<b>🔥 Today's Deals</b><br><br>"
-
-        for _, product in deals.iterrows():
-            reply += f"""
-            <div style='margin-bottom:15px;'>
-
-                <img
-                    src="/static/{product['image']}"
-                    width="80"
-                    height="80"
-                    style="border-radius:5px;"
-                    onerror="this.src='/static/images/no_image.jpg';"
-                >
-
-                <br><br>
-
-                ⭐ {product['product_name']}
-
-                <br>
-
-                💰 ₹{product['price']}
-
-                <br>
-
-                ⭐ Rating: {product['rating']}
-
-                <br><br>
-
-                <a
-                    href='/recommend/{product["product_id"]}'
-                    style='
-                        background:#ff9900;
-                        color:white;
-                        padding:6px 12px;
-                        text-decoration:none;
-                        border-radius:5px;
-                        display:inline-block;
-                    '
-                >
-                    View Product
-                </a>
-
-            </div>
-            """
-
-        return jsonify({
-            "reply": reply
-        })
-
-    if any(text in message for text in [
-
-        "trending products",
-        "what's trending",
-        "whats trending",
-        "hot picks",
-        "trending"
-
-    ]):
-
-        trending = (
-
-            products_df[
-
-                products_df['product_name']
-                .str.contains(
-                    r'dress|kurta|jeans|watch|shoe|sneaker|heel|bag|handbag|backpack',
-                    case=False,
-                    na=False,
-                    regex=True
-                )
-
-            ]
-
-                .sort_values(
-                by='rating',
-                ascending=False
-            )
-
-                .drop_duplicates(
-                subset='product_name'
-            )
-
-                .head(5)
-
-        )
-
-        reply = "<b>🔥 Hot Picks</b><br><br>"
-
-        for _, product in trending.iterrows():
-            reply += f"""
-            <div style='margin-bottom:15px;'>
-
-                <img
-                    src="/static/{product['image']}"
-                    width="80"
-                    height="80"
-                    style="border-radius:5px;"
-                    onerror="this.src='/static/images/no_image.jpg';"
-                >
-
-                <br><br>
-
-                ⭐ {product['product_name']}
-
-                <br>
-
-                💰 ₹{product['price']}
-
-                <br>
-
-                ⭐ Rating: {product['rating']}
-
-                <br><br>
-
-                <a
-                    href='/recommend/{product["product_id"]}'
-                    style='
-                        background:#ff9900;
-                        color:white;
-                        padding:6px 12px;
-                        text-decoration:none;
-                        border-radius:5px;
-                        display:inline-block;
-                    '
-                >
-                    View Product
-                </a>
-
-            </div>
-            """
-
-        return jsonify({
-            "reply": reply
-        })
-
-    # -----------------------------
-    # GREETINGS
-    # -----------------------------
-
-    if message in [
-        "hi",
-        "hello",
-        "hey",
-        "good morning",
-        "good afternoon",
-        "good evening"
-    ]:
-
-        return jsonify({
-
-            'reply':
-            '''
-            👋 Hello!
-
-            <br><br>
-
-            I can help you find products.
-
-            <br><br>
-
-            Try:
-
-            <br>
-
-            🛍️ bags
-
-            <br>
-
-            🛍️ sandals
-
-            <br>
-
-            💰 products under 5000
-
-            <br>
-
-            💰 bags under 3000
-
-            <br>
-
-            ⭐ recommend bags
-            '''
-
-        })
-
-    # -----------------------------
-    # HELP
-    # -----------------------------
-
-    if "help" in message:
-
-        return jsonify({
-
-            'reply':
-            '''
-            📋 Available Commands
-
-            <br><br>
-
-            🛍️ show bags
-
-            <br>
-
-            🛍️ show sandals
-
-            <br>
-
-            🛍️ show kitchen
-
-            <br>
-
-            💰 products under 5000
-
-            <br>
-
-            💰 bags under 3000
-
-            <br>
-
-            💰 sandals under 2000
-
-            <br>
-
-            ⭐ recommend bags
-
-            <br>
-
-            ⭐ recommend sandals
-            '''
-
-        })
-
-
-    # -----------------------------
-    # RECOMMEND PRODUCTS
-    # -----------------------------
-
-
-    if any(word in message for word in [
-
-        "recommend",
-        "suggest",
-        "need",
-        "looking for",
-        "show me"
-
-    ]):
-        print(products_df['category'].value_counts().head(20))
-
-        intent = extract_chatbot_intent(message)
-        print(intent)
-
-        results = chatbot_search(intent)
-
-        print("RESULT COUNT =", len(results))
-
-        if not results.empty:
-            return jsonify({
-                "reply": format_chatbot_products(results, intent)
-            })
-
-        return jsonify({
-            "reply":
-                "Sorry, I couldn't find matching products for that request."
-        })
-
     message = message.replace("fashionable", "")
     message = message.replace("stylish", "")
     message = message.replace("modern", "")
     message = message.replace("sleek", "")
     message = message.strip()
 
-    if "today" in message and "deal" in message:
-
-        results = products_df.sort_values(
-            by='rating',
-            ascending=False
-        ).head(5)
-
-        reply = "<b>Today's Top Deals:</b><br><br>"
-
-        for _, product in results.iterrows():
-            reply += f"""
-            ⭐ {product['product_name']}<br>
-            💰 ₹{product['price']}<br>
-            ⭐ {product['rating']}<br><br>
-            """
-
-        return jsonify({
-            "reply": reply
-        })
-
-    # -----------------------------
-    # COMBO RECOMMENDATIONS (APRIORI)
-    # -----------------------------
-
-    if is_combo_query:
-
-        combo_keyword = None
-
-        if "backpack" in message:
-            combo_keyword = "backpack"
-
-        elif "watch" in message:
-            combo_keyword = "watch"
-
-        elif "shoe" in message:
-            combo_keyword = "shoe"
-
-        elif "sandal" in message:
-            combo_keyword = "sandal"
-
-        elif "heel" in message:
-            combo_keyword = "heel"
-
-        elif "wedge" in message:
-            combo_keyword = "wedge"
-
-        elif "bag" in message:
-            combo_keyword = "bag"
-
-        if not combo_keyword:
-            return jsonify({
-                "reply":
-                    "Please specify a product. Example: 'What goes with heels?'"
-            })
-
-        # Find a matching product
-
-        base_products = products_df[
-
-            products_df['product_name']
-            .fillna('')
-            .str.contains(
-                combo_keyword,
-                case=False,
-                na=False
-            )
-
-        ]
-
-        if base_products.empty:
-            return jsonify({
-                "reply":
-                    f"I couldn't find any {combo_keyword} products."
-            })
-
-        base_product = base_products.iloc[0]
-
-        product_id = int(
-            base_product['product_id']
-        )
-
-        recommended_ids = get_apriori_recommendations(
-            product_id,
-            top_n=5
-        )
-
-        if not recommended_ids:
-
-            category_map = {
-
-                'footwear': [
-                    'bags, wallets & belts',
-                    'watches',
-                    'jewellery',
-                    'clothing'
-                ],
-
-                'clothing': [
-                    'footwear',
-                    'bags, wallets & belts',
-                    'watches'
-                ],
-
-                'bags, wallets & belts': [
-                    'footwear',
-                    'clothing',
-                    'watches'
-                ],
-
-                'watches': [
-                    'bags, wallets & belts',
-                    'footwear',
-                    'clothing'
-                ]
-            }
-
-            current_category = str(
-                base_product['category']
-            ).strip().lower()
-
-            target_categories = category_map.get(
-                current_category,
-                [current_category]
-            )
-
-            recommendations = products_df[
-
-                products_df['category']
-                .astype(str)
-                .str.strip()
-                .str.lower()
-                .isin(target_categories)
-
-            ].copy()
-
-            # Remove products without real images
-
-            recommendations = recommendations[
-
-                recommendations['image']
-                .notna()
-
-                &
-
-                (~recommendations['image']
-                 .str.contains(
-                    'default.jpg',
-                    case=False,
-                    na=False
-                ))
-                ]
-
-            # Remove the base product
-
-            recommendations = recommendations[
-                recommendations['product_id'] != product_id
-                ]
-
-            # Highest rated first
-
-            recommendations = recommendations.sort_values(
-                by='rating',
-                ascending=False
-            )
-
-            recommendations = recommendations.drop_duplicates(
-                subset='type_feature'
-            )
-
-            recommendations = recommendations.head(5)
-
-            recommendations = recommendations[
-
-                recommendations['product_id']
-                != product_id
-
-                ]
-
-            recommendations = recommendations.sort_values(
-                by='rating',
-                ascending=False
-            ).head(5)
-
-        else:
-
-            recommendations = products_df[
-
-                products_df['product_id']
-                .isin(recommended_ids)
-
-            ]
-
-
-        reply = f"""
-        <b>Frequently Bought Together with {combo_keyword.title()}:</b>
-        <br><br>
-        """
-
-        print(
-            "FINAL DISPLAY COUNT =",
-            len(recommendations)
-        )
-
-        for _, product in recommendations.iterrows():
-            reply += f"""
-            <div style='margin-bottom:15px;'>
-
-                <img
-                    src="/static/{product['image']}"
-                    width="80"
-                    height="80"
-                    style="border-radius:5px;"
-                    onerror="this.src='/static/images/no_image.jpg';"
-                >
-
-                <br><br>
-
-                ⭐ {product['product_name']}
-
-                <br>
-
-                💰 ₹{product['price']}
-
-                <br>
-
-                ⭐ Rating: {product['rating']}
-
-                <br><br>
-
-                <a
-                    href='/recommend/{product["product_id"]}'
-                    style='
-                        background:#ff9900;
-                        color:white;
-                        padding:6px 12px;
-                        text-decoration:none;
-                        border-radius:5px;
-                        display:inline-block;
-                    '
-                >
-                    View Product
-                </a>
-
-            </div>
-            """
-
-        return jsonify({
-            "reply": reply
-        })
 
     # -----------------------------
     # CLEAN QUERY

@@ -13,10 +13,15 @@ occasion_map = {
 
     "office": [
         "formal",
-        "shirt",
+        "loafer",
+        "heel",
+        "sandal",
+        "shoe",
         "blazer",
+        "shirt",
         "trouser",
-        "waistcoat"
+        "waistcoat",
+
     ],
 
 
@@ -980,9 +985,9 @@ def chatbot_search(intent):
 
                         pattern = "|".join(keywords)
 
-                        results = results[
+                        filtered = results[
                             results["type_feature"]
-                            .fillna('')
+                            .fillna("")
                             .str.contains(
                                 pattern,
                                 case=False,
@@ -991,7 +996,7 @@ def chatbot_search(intent):
                             )
                             |
                             results["product_name"]
-                            .fillna('')
+                            .fillna("")
                             .str.contains(
                                 pattern,
                                 case=False,
@@ -1000,7 +1005,12 @@ def chatbot_search(intent):
                             )
                             ]
 
-                        print("AFTER OCCASION =", len(results))
+                        print("AFTER OCCASION =", len(filtered))
+
+                        # Only apply the occasion filter if it finds products.
+                        # Otherwise, keep the previous results.
+                        if not filtered.empty:
+                            results = filtered
 
                     if (
                             intent["occasion"] == "travel"
@@ -1092,6 +1102,30 @@ def chatbot_search(intent):
         ]
 
         print("AFTER CLOTHING CLEANUP =", len(results))
+
+    # OFFICE FOOTWEAR CLEANUP
+
+    if (
+            intent.get("occasion") == "office"
+            and
+            intent.get("category") == "footwear"
+    ):
+        results = results[
+
+            ~
+
+            results["product_name"]
+            .fillna("")
+            .str.contains(
+                r"slipper|flip flop|flip-flop|Flip Flops|Running Shoes",
+                case=False,
+                na=False,
+                regex=True
+            )
+
+        ]
+
+        print("AFTER OFFICE FOOTWEAR CLEANUP =", len(results))
 
     # BUDGET
 
