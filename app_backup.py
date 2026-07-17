@@ -84,6 +84,9 @@ from recommendation.chatbot_combo import (
     handle_combo
 )
 
+from recommendation.chatbot_shopping import (
+    handle_shopping
+)
 
 import recommendation.chatbot_search
 
@@ -108,7 +111,6 @@ from flask import redirect
 
 
 import os
-import uuid
 
 import google.generativeai as genai
 
@@ -2444,11 +2446,11 @@ def decrease_quantity(product_id):
 
     return redirect('/cart')
 
-
 @app.route('/checkout')
 def checkout():
 
     if 'user_id' not in session:
+
         return redirect('/login')
 
     user_id = session['user_id']
@@ -2467,10 +2469,6 @@ def checkout():
 
     cart_items = cursor.fetchall()
 
-    # Generate ONE transaction id for this checkout
-    transaction_id = str(uuid.uuid4())
-
-    print("TRANSACTION ID =", transaction_id)
     for item in cart_items:
 
         product_id = item[0]
@@ -2479,16 +2477,14 @@ def checkout():
         cursor.execute(
             '''
             INSERT INTO orders(
-                transaction_id,
                 user_id,
                 product_id,
                 quantity
             )
 
-            VALUES(%s,%s,%s,%s)
+            VALUES(%s,%s,%s)
             ''',
             (
-                transaction_id,
                 user_id,
                 product_id,
                 quantity
@@ -2510,6 +2506,7 @@ def checkout():
     return render_template(
         'order_success.html'
     )
+
 
 @app.route('/orders')
 def orders():
@@ -2772,36 +2769,6 @@ def chat():
     print("=" * 60)
 
     # -----------------------------
-    # PERSONALIZED RECOMMENDATIONS
-    # -----------------------------
-
-    if query_type == "orders":
-        return handle_orders(mysql)
-
-    response = handle_deals(message)
-
-    if response:
-        return response
-
-    # -----------------------------
-    # GREETINGS
-    # -----------------------------
-
-    response = handle_greeting(message)
-
-    if response:
-        return response
-
-    # -----------------------------
-    # HELP
-    # -----------------------------
-
-    response = handle_help(message)
-
-    if response:
-        return response
-
-    # -----------------------------
     # COMBO RECOMMENDATIONS
     # -----------------------------
 
@@ -2845,6 +2812,40 @@ def chat():
             return jsonify({
                 "reply": format_chatbot_products(results, intent)
             })
+
+
+    combo_words = [
+
+        "goes with",
+        "combo",
+        "accessories",
+        "pair with",
+        "buy with"
+
+    ]
+
+    is_combo_query = any(
+        word in message
+        for word in combo_words
+    )
+
+    # -----------------------------------------
+    # GREETING
+    # -----------------------------------------
+
+    if query_type == "greeting":
+        return jsonify({
+            "reply": get_greeting()
+        })
+
+    # -----------------------------------------
+    # HELP
+    # -----------------------------------------
+
+    if query_type == "help":
+        return jsonify({
+            "reply": get_help()
+        })
 
     # -----------------------------------------
     # GENERAL AI
@@ -3020,6 +3021,72 @@ def chat():
         return " ".join(filtered)
 
     print("USER MESSAGE =", message)
+
+    # -----------------------------
+    # PERSONALIZED RECOMMENDATIONS
+    # -----------------------------
+
+    if query_type == "orders":
+        return handle_orders(mysql)
+
+
+
+    response = handle_deals(message)
+
+    if response:
+        return response
+
+    # -----------------------------
+    # GREETINGS
+    # -----------------------------
+
+    response = handle_greeting(message)
+
+    if response:
+        return response
+
+    # -----------------------------
+    # HELP
+    # -----------------------------
+
+    response = handle_help(message)
+
+    if response:
+        return response
+
+
+    # -----------------------------
+    # RECOMMEND PRODUCTS
+    # -----------------------------
+
+
+    if any(word in message for word in [
+
+        "recommend",
+        "suggest",
+        "need",
+        "looking for",
+        "show me"
+
+    ]):
+        print(products_df['category'].value_counts().head(20))
+
+        intent = extract_chatbot_intent(message)
+        print(intent)
+
+        results = chatbot_search(intent)
+
+        print("RESULT COUNT =", len(results))
+
+        if not results.empty:
+            return jsonify({
+                "reply": format_chatbot_products(results, intent)
+            })
+
+        return jsonify({
+            "reply":
+                "Sorry, I couldn't find matching products for that request."
+        })
 
     message = message.replace("fashionable", "")
     message = message.replace("stylish", "")
